@@ -1,0 +1,28 @@
+# Stage 1: Build the application
+FROM maven:3.8-openjdk-17-slim AS build
+
+# Set working directory for the build stage
+WORKDIR /app
+
+# Copy only the necessary files (pom.xml first, then source code)
+COPY pom.xml .
+COPY src ./src
+
+# Build the project and package it as a jar file (skip tests for faster builds)
+RUN mvn clean package -DskipTests
+
+# Stage 2: Create a minimal runtime image using Distroless
+FROM gcr.io/distroless/java17 AS runtime
+
+# Set the working directory for the runtime image
+WORKDIR /app
+
+# Copy the JAR file from the build stage to the runtime image
+COPY --from=build /app/target/myapp.jar /app/demo.jar
+
+# Expose the port that the Spring Boot app will run on
+EXPOSE 8080
+
+# Command to run the Spring Boot application
+CMD ["demo.jar"]
+
