@@ -1,0 +1,32 @@
+services:
+   wordpress:
+     container_name: wordpress
+     image: wordpress:latest
+     ports:
+       - 8080:80
+     environment:
+       WORDPRESS_DB_HOST: mydb
+       WORDPRESS_DB_USER: root
+       WORDPRESS_DB_PASSWORD: test123
+       WORDPRESS_DB_NAME: wordpress
+       WORDPRESS_TABLE_PREFIX: wp_
+     deploy:
+       resources:
+         limits:
+           cpus: '0.500'
+           memory: '512m'
+     depends_on:
+       - mydb
+   mydb:
+     container_name: mydb
+     image: mysql:5.7
+     environment:
+       MYSQL_ROOT_PASSWORD: test123
+       MYSQL_DATABASE: wordpress
+     volumes:
+       - wp_mysql:/var/lib/mysql
+
+volumes:
+  wp_mysql:
+
+
